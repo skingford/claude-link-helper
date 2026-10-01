@@ -1,0 +1,104 @@
+# Claude Link Helper
+
+[English](README.md) | **简体中文**
+
+一款 Chrome Manifest V3 扩展，用于复制 Claude 登录邮件中 **Sign in** 按钮对应的链接。它会在展开的邮件正文顶部显示复制按钮，全部在本地运行，无需服务端或构建步骤。
+
+扩展名称和浏览器简介为英文，操作按钮和状态提示目前使用简体中文。
+
+## 安装
+
+需要 Chrome 119 或更高版本。
+
+1. 下载或克隆本项目。如果使用打包后的 ZIP，请先解压。
+2. 打开 `chrome://extensions`，开启「开发者模式」。
+3. 点击「加载已解压的扩展程序」。使用源码时选择 **`extension/` 文件夹**；使用 ZIP 时选择解压后含 `manifest.json` 的文件夹。
+4. 刷新已经打开的邮箱页面，展开 Claude 登录邮件，点击正文顶部的 **「复制 Claude 登录链接」**。
+
+其他网页邮箱、企业自定义域名或未出现复制按钮时：点击 Chrome 工具栏中的插件图标，再点击 **「检测当前页面」**。可以在 Chrome 的扩展程序菜单中固定插件图标。
+
+复制只会将链接写入剪贴板，不会访问链接、触发登录或消耗一次性 token。是否已过期或已使用，需要由 Claude 在实际打开链接时判断。
+
+更新文件后，在 `chrome://extensions` 中点击本扩展的「重新加载」，再刷新邮箱页面，使页面使用新脚本。
+
+## 邮箱适配
+
+| 邮箱 | 处理方式 |
+| --- | --- |
+| Gmail | 自动运行，按展开的 `.a3s` 邮件正文分别识别 |
+| Outlook / Microsoft 365 | 自动运行，正文容器、iframe，支持 Safe Links 本地解包 |
+| Proton Mail | 自动运行，正文容器、iframe 和开放的 Shadow DOM |
+| Tuta / Tutanota / Tutamail | 在 Tuta 网页客户端域名自动运行，正文及开放的 Shadow DOM |
+| Zoho Mail | 在已配置的地区域名自动运行，使用正文容器适配 |
+| Yahoo、Fastmail、QQ、网易 163 / 126 | 自动运行，正文适配及通用检测 |
+| 企业自定义域名、其他网页邮箱 | 点击插件的「检测当前页面」，使用当前页面的临时访问权限 |
+
+这些是**已实现的适配策略，不代表所有生产邮箱版本都经过验证**。验证覆盖合成 DOM 页面和 Chromium 浏览器交互，尚未使用所有服务的真实账户完成逐站回归。邮箱改版、跨域受限 iframe、关闭的 Shadow DOM、纯图片按钮缺少可访问名称等情况，可能无法检测；插件会提示未找到或无法验证，不猜测登录地址。
+
+## 识别与防误复制
+
+- 识别 `Sign in`、`Sign in with Claude.ai`、`Log in`、`登录` 等按钮文案，包括图片的 `alt` 与 `aria-label`。
+- 只接受 **HTTPS、精确域名 `claude.ai`、认可的登录路径与凭据结构**。拒绝伪装域名、带用户信息的 URL、HTTP、任意子域名、非默认端口和普通首页链接。
+- 支持 `/magic-link` 的独立 token 和 `#token:base64载荷` 片段格式，以及带 token、ticket、code 等认可凭据参数的 `/login`、`/auth/verify`、`/auth/callback`。原样复制凭据片段，不解码或改写。路径或邮件模板改变时可能需要更新规则。
+- 本地解包 Microsoft Safe Links 和 Google `/url` 包装，最多四层。不请求短链服务，不访问跳转地址。未知追踪链接保持「无法验证」状态。
+- 同一邮件中完全相同的目标链接去重；不同 token 或参数均视为不同链接，显示数量并禁用复制。
+- 同时存在可验证和不可验证的 Sign in 链接时也禁用复制，不擅自选择其中一个。
+- 隐藏邮件和编辑器草稿不参与检测。引用的旧邮件链接不参与当前邮件选择，界面会标注已忽略引用。仅引用中有链接时禁用复制。
+- 每封已识别的邮件有独立按钮；无法确定邮件边界时，将该文档内的候选链接合并校验，遇到多个即禁用复制。
+- 点击复制前重新扫描；邮件或链接已变化时要求再次点击。支持单页应用切换邮件和异步加载正文。
+- 没有链接、多个链接、无法验证、仅有引用、页面过大、复制失败都有明确提示。
+
+域名校验不等于发件人认证。助手不验证 SPF 或 DKIM。
+
+复制按钮位于紧凑工具条右侧，状态提示在左侧。检测到可复制链接时，按钮会轻微浮起两次后停止；悬停、聚焦或点击即可停止提醒，系统开启「减少动态效果」时不播放。
+
+## 本地处理与权限
+
+运行时代码不含网络请求、统计、日志上报或远程依赖。邮件和链接只在当前页面内存中处理，不持久化，不使用浏览器存储、Cookie、邮箱 API 或后台服务。
+
+| 访问范围或权限 | 用途 |
+| --- | --- |
+| 声明的邮箱站点 content scripts | 邮件展开时自动显示助手，不申请全网站常驻访问权限 |
+| `activeTab` | 用户通过插件临时检测其他网页邮箱 |
+| `scripting` | 将随扩展打包的检测脚本注入当前选择的页面 |
+| `clipboardWrite` | 仅在点击复制时写入链接，不申请剪贴板读取权限 |
+
+UI 使用 Shadow DOM 隔离。状态中只展示域名和数量，不展示完整 token。插件弹窗只接收计数，链接不通过扩展消息传播。复制后链接属于系统剪贴板，剪贴板历史或同步功能由操作系统控制。
+
+## 开发与验证
+
+加载扩展不需要 Node.js。开发和测试需要 Node.js 20 或更高版本。`jsdom` 是开发依赖，不进入扩展安装包。
+
+```sh
+npm ci
+npm test
+npm run check
+npm run package
+```
+
+`npm run package` 使用系统 `zip` 命令生成 `dist/claude-link-helper-1.0.3.zip`。安装包只包含 `extension/` 下的文件，不打包测试、开发依赖和邮件样本。
+
+启动本地交互测试：
+
+```sh
+npm run demo
+# 打开 http://127.0.0.1:4173
+```
+
+所有测试凭据均为虚构数据。测试页包含唯一链接、冒号片段格式、多链接、无链接、伪装域名、Safe Links、引用旧邮件、Shadow DOM 与 iframe 场景。默认由测试页主动加载同一组生产脚本。验证已安装扩展的注入时，打开 `http://127.0.0.1:4173/?bare=1`，再点击插件的 **「检测当前页面」**。在 bare 模式下切换到 iframe 场景后，需要再次检测，以向新建的 frame 注入脚本。
+
+- `extension/core.js`：纯函数 URL 与按钮校验、离线解包、去重和歧义处理。
+- `extension/dom.js`：邮件正文定位、可见性检查、引用排除和 Shadow DOM 遍历。
+- `extension/content.js`：页面监听、邮件旁 UI、点击时重新校验和复制。
+- `extension/popup.*`：操作说明、手动检测和权限反馈。
+- `tests/`：URL 安全边界、邮箱结构、状态切换和弹窗测试；参见[验收说明](docs/TESTING.md)。
+
+## 最近更新
+
+- **1.0.3：** 修复弹窗宽度，避免 Chrome 初始窄视口导致标题和按钮文字竖向换行。
+- **1.0.2：** 增加透明工具条，右侧使用深炭色（`#292723`）复制按钮；精简弹窗、折叠说明，并支持深浅色弹窗主题。
+- **1.0.1：** 修复 `#token:base64载荷` 格式的登录链接被误判、导致复制按钮禁用的问题。
+
+技术参考：[Chrome 内容脚本与关联 frame](https://developer.chrome.com/docs/extensions/develop/concepts/content-scripts)、[activeTab 临时权限](https://developer.chrome.com/docs/extensions/develop/concepts/activeTab)、[脚本注入 API](https://developer.chrome.com/docs/extensions/reference/api/scripting)、[Claude 邮件登录说明](https://support.claude.com/en/articles/13189465-log-in-to-your-claude-account)。
+
+这是独立开发的辅助扩展，与 Anthropic 无隶属关系。

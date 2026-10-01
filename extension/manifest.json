@@ -1,12 +1,12 @@
 {
   "manifest_version": 3,
-  "name": "Claude 登录链接助手",
-  "version": "1.0.1",
+  "name": "Claude Link Helper",
+  "version": "1.0.3",
   "minimum_chrome_version": "119",
-  "description": "在邮件旁一键复制 Claude Sign in 登录链接。唯一链接校验、歧义提示，全部在本地处理。",
+  "description": "Copy Claude sign-in links from your email. Runs locally and warns about missing or ambiguous links.",
   "permissions": ["activeTab", "scripting", "clipboardWrite"],
   "action": {
-    "default_title": "Claude 登录链接助手",
+    "default_title": "Claude Link Helper",
     "default_popup": "popup.html",
     "default_icon": { "16": "icons/16.png", "32": "icons/32.png", "48": "icons/48.png", "128": "icons/128.png" }
   },

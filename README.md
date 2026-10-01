@@ -1,67 +1,73 @@
-# Claude 登录链接助手
+# Claude Link Helper
 
-一款无需服务端、无需构建即可加载的 Chrome Manifest V3 扩展。在展开的 Claude 登录邮件正文顶部显示 **「复制 Claude 登录链接」**，点击后复制 `Sign in` 按钮实际指向的登录链接。
+**English** | [简体中文](README.zh-CN.md)
 
-## 安装
+A Chrome Manifest V3 extension that copies the link behind the **Sign in** button in a Claude login email. It adds a copy button above the expanded message body and runs entirely on your device, with no server or build step required.
 
-需要 Chrome 119 或更高版本。
+The extension name and browser description are in English. Action labels and status messages are currently in Simplified Chinese.
 
-1. 下载本项目，或解压 `dist/claude-link-helper-1.0.1.zip`。
-2. 打开 `chrome://extensions`，开启右上角「开发者模式」。
-3. 点击「加载已解压的扩展程序」。使用源码时选择 **`extension/` 文件夹**；使用 ZIP 时选择解压后含 `manifest.json` 的文件夹。
-4. 刷新已经打开的邮箱页面，展开 Claude 登录邮件，点击邮件正文顶部的复制按钮。
+## Installation
 
-其他网页邮箱、企业自定义邮箱域名或未出现助手按钮时：点击 Chrome 工具栏里的插件图标，再点击「检测当前页面」。如果 Chrome 隐藏了插件图标，可在拼图菜单中将其固定。
+Requires Chrome 119 or later.
 
-复制只是写入剪贴板，不会访问链接、触发登录或消耗一次性 token。是否已过期、已使用，需要由 Claude 在实际登录时判断。
+1. Download or clone this repository. If you have a packaged ZIP, extract it first.
+2. Open `chrome://extensions` and enable **Developer mode**.
+3. Click **Load unpacked**. For the source repository, select the **`extension/` directory**. For a packaged ZIP, select the extracted directory containing `manifest.json`.
+4. Refresh any open webmail tabs, open a Claude login email, and click **复制 Claude 登录链接** (Copy Claude sign-in link) above the message body.
 
-更新源码后，在 `chrome://extensions` 中点击本扩展的重新加载按钮，再刷新邮箱页面，使页面使用新脚本。1.0.1 修复了 `#token:base64载荷` 格式被误判、导致复制按钮禁用的问题。
+For another webmail service, a custom company domain, or a missing copy button, open the extension from the Chrome toolbar and click **检测当前页面** (Scan current page). You can pin the extension through Chrome's Extensions menu.
 
-## 邮箱适配
+Copying only writes the link to your clipboard. It does not open the link, sign you in, or consume a one-time token. Claude determines whether the link has expired or already been used when you actually open it.
 
-| 邮箱 | 处理方式 |
+After updating the files, click **Reload** for the extension in `chrome://extensions`, then refresh your webmail tab to replace the old content scripts.
+
+## Supported webmail
+
+| Service | Detection strategy |
 | --- | --- |
-| Gmail | 自动运行，按展开的 `.a3s` 邮件正文分别识别 |
-| Outlook / Microsoft 365 | 自动运行，正文容器、iframe，支持 Safe Links 本地解包 |
-| Proton Mail | 自动运行，正文容器、iframe 和开放的 Shadow DOM |
-| Tuta / Tutanota / Tutamail | 在 Tuta 网页客户端域名自动运行，正文及开放的 Shadow DOM |
-| Zoho Mail | 自动运行，涵盖主要地区域名及正文容器 |
-| Yahoo、Fastmail、QQ、网易 163 / 126 | 自动运行，正文适配及通用检测 |
-| 企业自定义域名、其他网页邮箱 | 点击插件的「检测当前页面」，只授予当前页面临时访问权限 |
+| Gmail | Automatic; each expanded `.a3s` message body is handled separately |
+| Outlook / Microsoft 365 | Automatic; message containers and iframes, with offline Safe Links unwrapping |
+| Proton Mail | Automatic; message containers, iframes, and open Shadow DOM |
+| Tuta / Tutanota / Tutamail | Automatic on Tuta web client domains; message bodies and open Shadow DOM |
+| Zoho Mail | Automatic on the configured regional domains; message body adapters |
+| Yahoo, Fastmail, QQ Mail, NetEase 163 / 126 | Automatic; service-specific message containers and generic detection |
+| Custom company domains and other webmail | Manual scanning through the extension, using temporary access to the current page |
 
-这些是**已实现的适配策略，不是所有生产邮箱版本的兼容性认证**。当前已验证合成 DOM 页面和 Chromium 浏览器交互，未使用真实邮箱账户逐站回归。邮箱改版、跨域受限 iframe、关闭的 Shadow DOM、纯图片按钮缺少可访问名称等情况，可能无法检测；插件会提示未找到或无法验证，不猜测登录地址。
+These are **implemented detection strategies, not a guarantee that every production client version has been verified**. Validation covers synthetic DOM fixtures and Chromium browser interactions; a complete regression pass across real accounts on every service has not been performed. Webmail redesigns, restricted cross-origin iframes, closed Shadow DOM, or image-only buttons without accessible labels can prevent detection. The extension reports missing or unverified links instead of guessing.
 
-## 识别与防误复制
+## Link detection and copy safeguards
 
-- 识别 `Sign in`、`Sign in with Claude.ai`、`Log in`、`登录` 等按钮文案，包括图片的 `alt` 与 `aria-label`。
-- 只接受 **HTTPS、精确域名 `claude.ai`、认可的登录路径与 token 结构**。拒绝伪装域名、用户名伪装、HTTP、任意子域名、非默认端口和普通首页。
-- 支持 `/magic-link` 的独立 token 和 `#token:base64载荷` 片段格式，以及带 token / ticket / code 等凭证参数的 `/login`、`/auth/verify`、`/auth/callback`。原样复制片段，不解码或改写凭据。路径或邮件模板改变时需更新规则。
-- 本地解包 Microsoft Safe Links 和 Google `/url` 包装，最多四层。不请求短链服务，不访问任何跳转地址。未知追踪链接保留「无法验证」状态。
-- 同一邮件中完全相同的目标链接去重；不同 token 或参数均视为不同链接，显示数量并禁用复制。
-- 同时存在可验证和不可验证的 `Sign in` 链接时也禁用复制，不擅自选择其中一个。
-- 隐藏邮件、编辑器草稿不参与检测；引用的旧邮件链接不参与当前邮件选择，界面会标注已忽略引用。仅引用中有链接时禁用复制。
-- 已识别的每封邮件有独立按钮；无法确定邮件边界时，将该文档内的候选链接合并校验，遇到多个即停止复制。
-- 点击复制前重新扫描；邮件或链接已变化时要求再次确认点击。支持单页应用切换邮件和异步加载正文。
-- 没有链接、多个链接、无法验证、仅有引用、页面过大、复制失败都有明确提示。
+- Recognizes labels such as `Sign in`, `Sign in with Claude.ai`, `Log in`, and `登录`, including image `alt` text and `aria-label` values.
+- Accepts only **HTTPS URLs on the exact host `claude.ai`, with a recognized login path and credential structure**. Rejects lookalike hosts, URLs with user information, HTTP, arbitrary subdomains, non-default ports, and ordinary home-page links.
+- Supports `/magic-link` with either an opaque token or a `#token:base64-payload` fragment, plus `/login`, `/auth/verify`, and `/auth/callback` with recognized credential parameters such as token, ticket, or code. Credential fragments are copied unchanged, without decoding or rewriting them. New email templates or URL formats may require updated rules.
+- Unwraps Microsoft Safe Links and Google `/url` wrappers locally, up to four layers. It never requests a short-link service or visits redirect destinations. Unknown tracking links remain unverified.
+- Deduplicates identical destinations within a message. Different tokens or parameters count as different links; multiple destinations disable copying and show a count.
+- Disables copying when verified and unverified Sign in links appear together, rather than choosing one automatically.
+- Skips hidden messages and compose editors. Quoted older messages do not supply the current message's link; the UI indicates when quoted content was ignored. If links appear only in quoted content, copying stays disabled.
+- Gives each identified message its own button. If message boundaries cannot be determined, candidates in that document are checked together and multiple links disable copying.
+- Scans again immediately before copying. A changed message or link requires another click. Handles single-page navigation and asynchronously loaded message bodies.
+- Provides explicit feedback for missing links, multiple links, unverified links, quoted-only links, oversized pages, and clipboard failures.
 
-域名校验不等于发件人认证。助手不判断 SPF/DKIM，也不对邮件来源作认证。
+Host validation does not authenticate the sender. The extension does not verify SPF or DKIM.
 
-## 本地处理与权限
+The copy button sits on the right of a compact toolbar, with status text on the left. When a link becomes available, the button gently lifts twice, then stops. Hovering, focusing, or clicking stops the reminder; the system's reduced-motion setting disables it.
 
-运行时代码不含网络请求、统计、日志上报或远程依赖；邮件和链接只在当前页面的内存中处理。不持久化邮件或链接，不使用 `storage`、Cookie、邮箱 API 或后台服务。
+## Privacy and permissions
 
-| 权限 | 用途 |
+The extension runtime contains no network requests, analytics, log uploads, or remote dependencies. Email content and links are processed only in memory on the current page. They are not persisted, and the extension does not use browser storage, cookies, mail APIs, or a background service.
+
+| Access or permission | Purpose |
 | --- | --- |
-| 声明的邮箱站点 content scripts | 邮件展开时自动显示助手，不申请全网站常驻访问权限 |
-| `activeTab` | 用户通过插件按钮临时检测其他网页邮箱 |
-| `scripting` | 将本地检测脚本注入用户选择的当前页面 |
-| `clipboardWrite` | 仅在用户点击复制时写入链接，不申请剪贴板读取权限 |
+| Content scripts on listed webmail sites | Show the helper automatically when a message is opened, without requesting persistent access to every website |
+| `activeTab` | Temporarily scan another webmail page after the user invokes the extension |
+| `scripting` | Inject the bundled detection scripts into the selected page |
+| `clipboardWrite` | Write a link only after a copy click; clipboard reading is not requested |
 
-UI 使用 Shadow DOM 隔离，状态中只展示域名和数量，不展示完整 token。插件弹窗只接收计数，链接不通过扩展消息传播。复制后链接属于系统剪贴板，系统剪贴板同步或历史功能由用户的操作系统控制。
+Shadow DOM isolates the UI. Status messages show the host and counts, not full tokens. The popup receives only counts, and links are not passed through extension messages. After copying, the link belongs to the system clipboard; clipboard history and synchronization are controlled by your operating system.
 
-## 开发与验证
+## Development and validation
 
-运行扩展不需要 Node.js；Node.js 20+ 只用于开发测试。`jsdom` 是开发依赖，不进入扩展安装包。
+Node.js is not required to load the extension. Development and tests require Node.js 20 or later. `jsdom` is a development dependency and is excluded from the extension package.
 
 ```sh
 npm ci
@@ -70,23 +76,29 @@ npm run check
 npm run package
 ```
 
-`npm run package` 在 `dist/` 生成 ZIP（需要系统 `zip` 命令），只包含 `extension/` 下运行所需的文件，不打包测试、依赖和邮件样本。
+`npm run package` creates `dist/claude-link-helper-1.0.3.zip` using the system `zip` command. The archive contains only files from `extension/`, excluding tests, development dependencies, and email fixtures.
 
-本地交互测试：
+To run the local interactive demo:
 
 ```sh
 npm run demo
-# 打开 http://127.0.0.1:4173
+# Open http://127.0.0.1:4173
 ```
 
-所有测试 token 均为 `TEST_ONLY` 虚构值。测试页可切换唯一链接、多链接、无链接、伪装域名、Safe Links、引用旧链接、Shadow DOM 与 iframe。该测试页主动加载相同的运行时代码；验证实际扩展的手动注入时使用 `http://127.0.0.1:4173/?bare=1`，再点击已安装插件的「检测当前页面」。
+All test credentials are synthetic. The demo includes single-link, colon-separated fragment, multiple-link, missing-link, lookalike-host, Safe Links, quoted-message, Shadow DOM, and iframe scenarios. By default, the page loads the same production scripts itself. To test injection by the installed extension, open `http://127.0.0.1:4173/?bare=1` and use **检测当前页面** (Scan current page). After switching to the iframe scenario in bare mode, scan again to inject into the new frame.
 
-- `extension/core.js`：纯函数 URL 与按钮校验，离线解包、去重和歧义决策。
-- `extension/dom.js`：邮箱正文定位、可见性、引用排除、Shadow DOM 遍历。
-- `extension/content.js`：页面监听、邮件旁 UI、点击时重验和复制。
-- `extension/popup.*`：操作说明、手动检测和权限错误提示。
-- `tests/`：URL 安全边界、各邮箱结构、状态切换和弹窗测试；[验收说明](docs/TESTING.md)。
+- `extension/core.js`: pure URL and label validation, offline unwrapping, deduplication, and ambiguity handling.
+- `extension/dom.js`: message boundaries, visibility checks, quote exclusion, and Shadow DOM traversal.
+- `extension/content.js`: page observation, inline UI, click-time revalidation, and copying.
+- `extension/popup.*`: usage instructions, manual scanning, and permission feedback.
+- `tests/`: URL safety cases, webmail fixtures, state changes, and popup tests. See the [validation notes (Chinese)](docs/TESTING.md).
 
-技术参考：[Chrome 内容脚本与关联 frame](https://developer.chrome.com/docs/extensions/develop/concepts/content-scripts)、[activeTab 临时权限](https://developer.chrome.com/docs/extensions/develop/concepts/activeTab)、[脚本注入 API](https://developer.chrome.com/docs/extensions/reference/api/scripting)、[Claude 邮件登录说明](https://support.claude.com/en/articles/13189465-log-in-to-your-claude-account)。
+## Recent changes
 
-这是独立开发的辅助扩展，与 Anthropic 无隶属关系。
+- **1.0.3:** Fixed popup width so Chrome's initial narrow viewport cannot collapse the title and button into vertical text.
+- **1.0.2:** Introduced a transparent toolbar with a right-aligned charcoal (`#292723`) copy button, a compact popup with collapsible help, and light/dark popup themes.
+- **1.0.1:** Fixed rejection of `#token:base64-payload` login links that left the copy button disabled.
+
+Technical references: [Chrome content scripts and related frames](https://developer.chrome.com/docs/extensions/develop/concepts/content-scripts), [temporary activeTab access](https://developer.chrome.com/docs/extensions/develop/concepts/activeTab), [script injection API](https://developer.chrome.com/docs/extensions/reference/api/scripting), and [Claude email login](https://support.claude.com/en/articles/13189465-log-in-to-your-claude-account).
+
+This is an independently developed extension and is not affiliated with Anthropic.

@@ -3,32 +3,28 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Claude 登录链接助手</title>
+  <title>Claude Link Helper</title>
   <link rel="stylesheet" href="popup.css">
 </head>
 <body>
   <header>
-    <img src="icons/48.png" width="40" height="40" alt="">
-    <div><h1>Claude 登录链接助手</h1><p>从邮件到登录，少一步操作。</p></div>
+    <svg class="app-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m10 13 4-4M8 15l-1 1a4 4 0 0 1-5.7-5.7l4-4A4 4 0 0 1 11 6m2 12a4 4 0 0 0 5.7-.3l4-4A4 4 0 0 0 17 8l-1 1" transform="translate(0 -1)"/></svg>
+    <h1 lang="en">Claude Link Helper</h1>
   </header>
   <main>
-    <section class="card" aria-labelledby="how-title">
-      <div class="eyebrow">MAIL → LINK</div>
-      <h2 id="how-title">打开邮件，点击复制。</h2>
-      <p>打开 Claude 登录邮件，正文旁会显示<br><strong>「复制 Claude 登录链接」</strong>。</p>
-      <div class="rule"><span class="dot"></span>只有唯一且通过校验的链接可以复制</div>
-    </section>
-    <section class="scan-area" aria-label="当前页面检测">
-      <button id="scan" type="button">检测当前页面 <span aria-hidden="true">↗</span></button>
-      <p id="status" role="status" aria-live="polite">没有看到按钮？点击检测，也适用于其他网页邮箱。</p>
-    </section>
+    <p class="instruction">打开登录邮件，在正文旁复制链接。</p>
+    <button id="scan" type="button">检测当前页面</button>
+    <p id="status" role="status" aria-live="polite">未出现复制按钮时，可手动检测。</p>
     <details>
-      <summary>支持哪些邮箱？</summary>
-      <p>自动检测 Gmail、Outlook、Proton Mail、Tuta / Tutanota、Zoho Mail，以及 Yahoo、Fastmail、QQ 邮箱和网易邮箱。</p>
-      <p>企业自定义域名和其他邮箱可点击上方按钮检测。页面需已展开邮件正文；受限的跨域内嵌邮件可能无法读取。</p>
+      <summary>使用说明<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m6 4 4 4-4 4"/></svg></summary>
+      <div class="help">
+        <p>自动检测 Gmail、Outlook、Proton、Tuta、Zoho、Yahoo、Fastmail、QQ 和网易邮箱。</p>
+        <p>其他邮箱可手动检测。请先展开正文；受限的内嵌邮件可能无法读取。</p>
+        <p>找到多个链接或无法验证时，复制按钮会停用。</p>
+      </div>
     </details>
   </main>
-  <footer><span aria-hidden="true">◉</span> 仅本地处理 · 不上传邮件或登录链接</footer>
+  <footer>邮件和链接仅在本地处理。</footer>
   <script src="popup.js"></script>
 </body>
 </html>
