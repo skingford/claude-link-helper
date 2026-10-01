@@ -71,3 +71,37 @@ test('valid plus unknown Sign in is blocked; never silently picks the valid-look
 test('incomplete scans fail closed', () => {
   assert.equal(analyzeCandidates([candidate(first)], { overflow: true }).status, 'overflow');
 });
+
+test('accepts colon-separated magic-link credentials and preserves the exact URL', () => {
+  // Synthetic credentials only; this test must never contain a real mail link.
+  const composite = 'https://claude.ai/magic-link#0123456789abcdef0123456789abcdef:dGVzdEBleGFtcGxlLmludmFsaWQ=';
+  assert.deepEqual(inspectUrl(composite), { ok: true, url: composite, unwrapped: false });
+  assert.deepEqual(inspectUrl(safeLink(composite)), { ok: true, url: composite, unwrapped: true });
+  const result = analyzeCandidates([candidate(composite)]);
+  assert.equal(result.status, 'ready');
+  assert.equal(result.links[0].url, composite);
+});
+test('composite credentials retain base64 punctuation and still detect multiple logins', () => {
+  const prefix = 'https://claude.ai/magic-link#0123456789abcdef0123456789abcdef:';
+  for (const suffix of ['TEST+ONLY/PAYLOAD==', 'TEST_ONLY-PAYLOAD=', 'TEST%2BONLY%2FPAYLOAD%3D']) {
+    assert.equal(inspectUrl(prefix + suffix).url, prefix + suffix);
+  }
+  assert.equal(analyzeCandidates([candidate(prefix + 'TEST_A'), candidate(prefix + 'TEST_B')]).status, 'multiple');
+});
+test('empty or malformed composite credentials and spoofed domains remain rejected', () => {
+  for (const suffix of [':', ':TEST', 'TEST:', 'TEST:OTHER:PART', 'TEST:OTHER&next=1', 'https://evil.example']) {
+    assert.equal(inspectUrl(`https://claude.ai/magic-link#${suffix}`).ok, false);
+  }
+  assert.equal(inspectUrl('https://claude.ai.evil.example/magic-link#TEST:PAYLOAD=').ok, false);
+});
+test('rejection diagnostics contain fixed reason codes and counts, never credentials', () => {
+  const result = analyzeCandidates([
+    candidate('https://unknown.example/PRIVATE_PATH?token=PRIVATE_TOKEN#PRIVATE_FRAGMENT'),
+    candidate('https://claude.ai/unsupported#PRIVATE_PAYLOAD'),
+  ]);
+  assert.deepEqual(result.rejections, [
+    { reason: 'unrecognized-host', count: 1 },
+    { reason: 'not-login-link', count: 1 },
+  ]);
+  assert.equal(JSON.stringify(result).includes('PRIVATE_'), false);
+});

@@ -6,7 +6,7 @@
 
 需要 Chrome 119 或更高版本。
 
-1. 下载本项目，或解压 `dist/claude-link-helper-1.0.0.zip`。
+1. 下载本项目，或解压 `dist/claude-link-helper-1.0.1.zip`。
 2. 打开 `chrome://extensions`，开启右上角「开发者模式」。
 3. 点击「加载已解压的扩展程序」。使用源码时选择 **`extension/` 文件夹**；使用 ZIP 时选择解压后含 `manifest.json` 的文件夹。
 4. 刷新已经打开的邮箱页面，展开 Claude 登录邮件，点击邮件正文顶部的复制按钮。
@@ -14,6 +14,8 @@
 其他网页邮箱、企业自定义邮箱域名或未出现助手按钮时：点击 Chrome 工具栏里的插件图标，再点击「检测当前页面」。如果 Chrome 隐藏了插件图标，可在拼图菜单中将其固定。
 
 复制只是写入剪贴板，不会访问链接、触发登录或消耗一次性 token。是否已过期、已使用，需要由 Claude 在实际登录时判断。
+
+更新源码后，在 `chrome://extensions` 中点击本扩展的重新加载按钮，再刷新邮箱页面，使页面使用新脚本。1.0.1 修复了 `#token:base64载荷` 格式被误判、导致复制按钮禁用的问题。
 
 ## 邮箱适配
 
@@ -33,7 +35,7 @@
 
 - 识别 `Sign in`、`Sign in with Claude.ai`、`Log in`、`登录` 等按钮文案，包括图片的 `alt` 与 `aria-label`。
 - 只接受 **HTTPS、精确域名 `claude.ai`、认可的登录路径与 token 结构**。拒绝伪装域名、用户名伪装、HTTP、任意子域名、非默认端口和普通首页。
-- 支持 `/magic-link`，以及带 token / ticket / code 等凭证参数的 `/login`、`/auth/verify`、`/auth/callback`。路径或邮件模板改变时需更新规则。
+- 支持 `/magic-link` 的独立 token 和 `#token:base64载荷` 片段格式，以及带 token / ticket / code 等凭证参数的 `/login`、`/auth/verify`、`/auth/callback`。原样复制片段，不解码或改写凭据。路径或邮件模板改变时需更新规则。
 - 本地解包 Microsoft Safe Links 和 Google `/url` 包装，最多四层。不请求短链服务，不访问任何跳转地址。未知追踪链接保留「无法验证」状态。
 - 同一邮件中完全相同的目标链接去重；不同 token 或参数均视为不同链接，显示数量并禁用复制。
 - 同时存在可验证和不可验证的 `Sign in` 链接时也禁用复制，不擅自选择其中一个。

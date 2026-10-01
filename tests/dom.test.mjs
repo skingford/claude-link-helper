@@ -159,3 +159,23 @@ test('scan limits disable a known good link instead of ignoring unseen candidate
   const { scan } = setup(t, `<div class="a3s">${link()}${'<button>Other</button>'.repeat(3001)}</div>`);
   assert.equal(scan().results[0].status, 'overflow');
 });
+
+test('Gmail colon-separated magic link enables copy and writes exact credentials', async (t) => {
+  const composite = 'https://claude.ai/magic-link#0123456789abcdef0123456789abcdef:dGVzdEBleGFtcGxlLmludmFsaWQ=';
+  const { shadows, copied, click } = setup(t, `<div class="a3s"><h2>Sign in to Claude.ai</h2>${link(composite)}</div>`, true);
+  const button = shadows[0].querySelector('button');
+  assert.equal(button.disabled, false);
+  await click(button);
+  assert.deepEqual(copied, [composite]);
+  assert.equal(button.textContent, '已复制');
+  assert.equal(shadows[0].textContent.includes('0123456789abcdef'), false);
+});
+test('unsupported-format UI explains the reason without showing URL credentials', (t) => {
+  const { shadows, document, window } = setup(t, `<div class="a3s">${link('https://claude.ai/unsupported#PRIVATE_PAYLOAD')}</div>`, true);
+  assert.match(shadows[0].textContent, /登录路径或凭证格式暂未支持/);
+  assert.equal(shadows[0].textContent.includes('PRIVATE_PAYLOAD'), false);
+  document.querySelector('a').href = 'https://unknown.example/PRIVATE_PAYLOAD';
+  window.ClaudeLinkHelper.scan();
+  assert.match(shadows[0].textContent, /尚未支持的域名或邮件追踪链接/);
+  assert.equal(shadows[0].textContent.includes('PRIVATE_PAYLOAD'), false);
+});

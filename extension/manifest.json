@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Claude 登录链接助手",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "minimum_chrome_version": "119",
   "description": "在邮件旁一键复制 Claude Sign in 登录链接。唯一链接校验、歧义提示，全部在本地处理。",
   "permissions": ["activeTab", "scripting", "clipboardWrite"],

@@ -37,7 +37,18 @@
     switch (result.status) {
       case "ready": return `${result.links[0].unwrapped ? "已还原跳转 · " : ""}claude.ai · 唯一登录链接${result.quotedCount ? " · 已忽略引用内容" : ""}`;
       case "multiple": return `发现 ${result.links.length} 个不同登录链接，已停止复制。请单独打开目标邮件。`;
-      case "unverified": return "有 Sign in 链接无法验证，请检查邮件原文；不会自动跟随跳转。";
+      case "unverified": {
+        const reasons = result.rejections || [];
+        const explanations = {
+          "unrecognized-host": "Sign in 使用了尚未支持的域名或邮件追踪链接，暂不能复制。",
+          "invalid-url": "Sign in 按钮没有可读取的有效 HTTPS 链接，暂不能复制。",
+          "not-login-link": "已识别 claude.ai，但登录路径或凭证格式暂未支持。",
+          "ambiguous-redirect": "跳转链接缺少目标或包含冲突目标，无法确定要复制哪一个。",
+          "redirect-depth": "跳转链接嵌套过多，无法在本地完整解析。",
+        };
+        if (reasons.length === 1) return explanations[reasons[0].reason] || "链接无法验证。";
+        return "有多种无法验证的 Sign in 链接，请检查邮件按钮；不会自动跟随跳转。";
+      }
       case "quoted": return "仅在引用内容中发现 Sign in，请打开原始登录邮件。";
       case "overflow": return "页面内容过多，无法完整核验。请单独打开目标邮件后重试。";
       default: return "未找到 Claude 登录链接。请展开邮件正文，确认其中包含 Sign in 按钮。";
@@ -46,7 +57,7 @@
 
   function render(panel, result) {
     panel.result = result;
-    const signature = JSON.stringify([result.status, result.links, result.quotedCount]);
+    const signature = JSON.stringify([result.status, result.links, result.quotedCount, result.rejections]);
     if (signature === panel.signature) return;
     panel.signature = signature;
     panel.box.dataset.state = result.status;

@@ -53,8 +53,11 @@
     const params = new URLSearchParams(url.search);
     const hashParams = new URLSearchParams(url.hash.slice(1));
     const hasToken = ["token", "ticket", "code", "login_token", "magic_link_token"].some((key) => params.get(key) || hashParams.get(key));
-    // Some mail versions carry the opaque token directly in the magic-link fragment.
-    return hasToken || (path === "/magic-link" && /^#[A-Za-z0-9_%+./~-]+={0,2}$/.test(url.hash));
+    // Mail may use either an opaque fragment or "token:base64 payload". Inspect
+    // the shape only; never decode, normalize or rebuild either credential part.
+    const opaqueFragment = /^#[A-Za-z0-9_%+./~-]+={0,2}$/.test(url.hash);
+    const pairedFragment = /^#[A-Za-z0-9_-]+:[A-Za-z0-9+/_%-]+={0,2}$/.test(url.hash);
+    return hasToken || (path === "/magic-link" && (opaqueFragment || pairedFragment));
   }
 
   function inspectUrl(value) {
@@ -77,6 +80,7 @@
 
   function analyzeCandidates(candidates, { quotedCount = 0, overflow = false } = {}) {
     const unique = new Map();
+    const rejectedReasons = new Map();
     let rejectedCount = 0;
     let signInCount = 0;
     for (const candidate of candidates) {
@@ -85,6 +89,7 @@
       const inspected = inspectUrl(candidate.href);
       if (!inspected.ok) {
         rejectedCount += 1;
+        rejectedReasons.set(inspected.reason, (rejectedReasons.get(inspected.reason) || 0) + 1);
         continue;
       }
       unique.set(inspected.url, inspected);
@@ -96,7 +101,9 @@
     else if (rejectedCount > 0) status = "unverified";
     else if (links.length === 1) status = "ready";
     else if (quotedCount > 0) status = "quoted";
-    return { status, links, signInCount, rejectedCount, quotedCount };
+    // Fixed reason codes only: never expose URLs, paths or credential values in diagnostics.
+    const rejections = [...rejectedReasons].map(([reason, count]) => ({ reason, count }));
+    return { status, links, signInCount, rejectedCount, quotedCount, rejections };
   }
 
   globalThis.ClaudeLinkCore = Object.freeze({ normalizeLabel, isSignInLabel, inspectUrl, analyzeCandidates });
