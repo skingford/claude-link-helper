@@ -1,0 +1,11 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Claude Link Helper · 弹窗复制测试</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f4f4f2;color:#292723;font:14px/1.6 system-ui,sans-serif}main{max-width:1100px;margin:28px auto;padding:0 20px}h1{font-size:20px;margin:0 0 6px}.note{color:#65615a;font-size:12px;margin:0 0 18px}.controls{display:flex;gap:8px;margin:18px 0;flex-wrap:wrap}.controls button{padding:7px 12px;border:1px solid #d7d4cc;border-radius:5px;background:#fff;cursor:pointer}.grid{display:grid;grid-template-columns:minmax(300px,1fr) 322px;gap:24px;align-items:start}h2{font-size:13px;font-weight:500;color:#65615a;margin:0 0 8px}iframe{width:100%;border:1px solid #d7d4cc;border-radius:6px;background:#fff}#mail{height:480px}#popup{height:460px}.paste{margin-top:20px}textarea{display:block;width:100%;height:62px;padding:12px;border:1px solid #d7d4cc;border-radius:5px;background:#fff;font:12px/1.5 monospace}@media(max-width:720px){.grid{grid-template-columns:1fr}#popup{width:322px}}
+</style></head><body><main>
+<h1>弹窗复制测试</h1><p class="note">全部使用虚构凭据。此页模拟扩展 API，运行生产检测与弹窗脚本；不会登录或访问 Claude。</p>
+<div class="controls"><button id="one">唯一链接</button><button id="many">多个链接</button><button id="change">切换邮件</button></div>
+<div class="grid"><section><h2>没有专用适配的网页邮箱</h2><iframe id="mail" title="测试邮件"></iframe></section><section><h2>插件弹窗</h2><iframe id="popup" title="插件弹窗" src="/extension/popup.html"></iframe></section></div>
+<div class="paste"><label for="paste">复制后粘贴到这里核对</label><textarea id="paste" placeholder="应包含 TEST_ONLY"></textarea></div>
+<p id="fixture-status" class="note">正在准备测试环境…</p>
+</main><script src="/tests/popup-demo.js"></script></body></html>

@@ -11,6 +11,8 @@
     ".mail-body", ".mailBody", ".mail-body-content", '[data-testid="mail-body"]',
     ".zmMailContent", ".zmMailBody", ".zmail-content", ".mailContent",
     '[data-test-id="message-view-body-content"]', ".v-MailMessage-body",
+    '[data-test-id="message-body"]', '[data-testid="message-body"]',
+    ".message-body", "#messageBody", ".msgBody", // AOL / generic mail readers
     "#mailContentContainer", "#contentDiv", ".mailinfo .body", ".nui-msgbox-body",
   ].join(",");
   const QUOTE_SELECTORS = 'blockquote, .gmail_quote, .gmail_extra, .protonmail_quote, .tutanota_quote, .yahoo_quoted, [data-testid="quoted-message"]';

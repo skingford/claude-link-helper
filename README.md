@@ -15,7 +15,7 @@ Requires Chrome 119 or later.
 3. Click **Load unpacked**. For the source repository, select the **`extension/` directory**. For a packaged ZIP, select the extracted directory containing `manifest.json`.
 4. Refresh any open webmail tabs, open a Claude login email, and click **复制 Claude 登录链接** (Copy Claude sign-in link) above the message body.
 
-For another webmail service, a custom company domain, or a missing copy button, open the extension from the Chrome toolbar and click **检测当前页面** (Scan current page). You can pin the extension through Chrome's Extensions menu.
+For AOL, another webmail service, a custom company domain, or a missing inline button, open the extension from the Chrome toolbar and click **检测当前页面** (Scan current page). When exactly one verified message is found, the popup shows **复制 Claude 登录链接** (Copy Claude sign-in link), so you can copy without locating the inline toolbar. Multiple or unverified results disable popup copying. You can pin the extension through Chrome's Extensions menu.
 
 Copying only writes the link to your clipboard. It does not open the link, sign you in, or consume a one-time token. Claude determines whether the link has expired or already been used when you actually open it.
 
@@ -44,7 +44,7 @@ These are **implemented detection strategies, not a guarantee that every product
 - Deduplicates identical destinations within a message. Different tokens or parameters count as different links; multiple destinations disable copying and show a count.
 - Disables copying when verified and unverified Sign in links appear together, rather than choosing one automatically.
 - Skips hidden messages and compose editors. Quoted older messages do not supply the current message's link; the UI indicates when quoted content was ignored. If links appear only in quoted content, copying stays disabled.
-- Gives each identified message its own button. If message boundaries cannot be determined, candidates in that document are checked together and multiple links disable copying.
+- Gives each identified message its own button. If message boundaries cannot be determined, candidates in that document are checked together and copying is provided only in the extension popup. The original email markup is left unchanged, and multiple links still disable copying.
 - Scans again immediately before copying. A changed message or link requires another click. Handles single-page navigation and asynchronously loaded message bodies.
 - Provides explicit feedback for missing links, multiple links, unverified links, quoted-only links, oversized pages, and clipboard failures.
 
@@ -63,7 +63,7 @@ The extension runtime contains no network requests, analytics, log uploads, or r
 | `scripting` | Inject the bundled detection scripts into the selected page |
 | `clipboardWrite` | Write a link only after a copy click; clipboard reading is not requested |
 
-Shadow DOM isolates the UI. Status messages show the host and counts, not full tokens. The popup receives only counts, and links are not passed through extension messages. After copying, the link belongs to the system clipboard; clipboard history and synchronization are controlled by your operating system.
+Shadow DOM isolates the UI. Status messages show the host and counts, not full tokens. Scanning sends only counts and a non-secret revision number to the popup. Only after an explicit popup copy click is a freshly revalidated link passed locally to the popup for clipboard writing; it is not stored or sent over the network. The copy request is bound to the checked document, and changed or ambiguous results require another scan. If some frames cannot be read, the popup discloses that scanning covers only the readable scope. After copying, clipboard history and synchronization are controlled by your operating system.
 
 ## Development and validation
 
@@ -76,7 +76,7 @@ npm run check
 npm run package
 ```
 
-`npm run package` creates `dist/claude-link-helper-1.0.4.zip` using the system `zip` command. The archive contains only files from `extension/`, excluding tests, development dependencies, and email fixtures.
+`npm run package` creates `dist/claude-link-helper-1.0.7.zip` using the system `zip` command. The archive contains only files from `extension/`, excluding tests, development dependencies, and email fixtures.
 
 Run `npm run icons` to regenerate the bundled PNG icons from the official Claude SVG mark. See the [asset source notes](assets/README.md).
 
@@ -89,6 +89,8 @@ npm run demo
 
 All test credentials are synthetic. The demo includes single-link, colon-separated fragment, multiple-link, missing-link, lookalike-host, Safe Links, quoted-message, Shadow DOM, and iframe scenarios. By default, the page loads the same production scripts itself. To test injection by the installed extension, open `http://127.0.0.1:4173/?bare=1` and use **检测当前页面** (Scan current page). After switching to the iframe scenario in bare mode, scan again to inject into the new frame.
 
+For popup copying, open `http://127.0.0.1:4173/tests/popup-demo.html`. This local harness simulates Chrome's scripting API while running the production detection and popup scripts, and supports testing changed messages and ambiguous links. It does not replace testing an installed extension.
+
 - `extension/core.js`: pure URL and label validation, offline unwrapping, deduplication, and ambiguity handling.
 - `extension/dom.js`: message boundaries, visibility checks, quote exclusion, and Shadow DOM traversal.
 - `extension/content.js`: page observation, inline UI, click-time revalidation, and copying.
@@ -97,6 +99,9 @@ All test credentials are synthetic. The demo includes single-link, colon-separat
 
 ## Recent changes
 
+- **1.0.7:** The popup now always uses light mode, with a solid copy button and a plain scan button, regardless of the browser or system theme.
+- **1.0.6:** Generic detection no longer inserts controls into an unknown email layout; copying remains available in the popup without changing the original Sign in button.
+- **1.0.5:** Added direct popup copying after a manual scan, with fresh document/link checks.
 - **1.0.4:** Replaced the extension and popup icons with the official Claude symbol, bundled locally as transparent PNGs.
 - **1.0.3:** Fixed popup width so Chrome's initial narrow viewport cannot collapse the title and button into vertical text.
 - **1.0.2:** Introduced a transparent toolbar with a right-aligned charcoal (`#292723`) copy button, a compact popup with collapsible help, and light/dark popup themes.

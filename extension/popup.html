@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
   <title>Claude Link Helper</title>
   <link rel="stylesheet" href="popup.css">
 </head>
@@ -12,19 +13,21 @@
     <h1 lang="en">Claude Link Helper</h1>
   </header>
   <main>
-    <p class="instruction">打开登录邮件，在正文旁复制链接。</p>
-    <button id="scan" type="button">检测当前页面</button>
+    <p class="instruction">打开登录邮件，检测后即可复制链接。</p>
+    <button id="copy" class="button button--primary" type="button" hidden disabled>复制 Claude 登录链接</button>
+    <button id="scan" class="button button--plain" type="button">检测当前页面</button>
     <p id="status" role="status" aria-live="polite">未出现复制按钮时，可手动检测。</p>
     <details>
       <summary>使用说明<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m6 4 4 4-4 4"/></svg></summary>
       <div class="help">
         <p>自动检测 Gmail、Outlook、Proton、Tuta、Zoho、Yahoo、Fastmail、QQ 和网易邮箱。</p>
-        <p>其他邮箱可手动检测。请先展开正文；受限的内嵌邮件可能无法读取。</p>
+        <p>其他邮箱可手动检测，找到唯一链接后可直接在这里复制。请先展开正文；受限的内嵌邮件可能无法读取。</p>
         <p>找到多个链接或无法验证时，复制按钮会停用。</p>
       </div>
     </details>
   </main>
   <footer>邮件和链接仅在本地处理。</footer>
+  <script src="core.js"></script>
   <script src="popup.js"></script>
 </body>
 </html>

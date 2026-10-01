@@ -179,3 +179,84 @@ test('unsupported-format UI explains the reason without showing URL credentials'
   assert.match(shadows[0].textContent, /尚未支持的域名或邮件追踪链接/);
   assert.equal(shadows[0].textContent.includes('PRIVATE_PAYLOAD'), false);
 });
+
+test('unknown mail readers provide popup copying without changing any mail markup', (t) => {
+  const html = `<header>AOL Mail</header><main><article><div class="cta" style="background:#141413;border-radius:10px">${link()}</div></article></main>`;
+  const { window, document, scan, copied } = setup(t, html);
+  const before = document.body.innerHTML;
+  window.eval(source('content'));
+  const result = scan().results[0];
+  assert.equal(result.scope, document.body);
+  assert.equal(result.fallback, true);
+  const summary = window.ClaudeLinkHelper.scan();
+  assert.equal(summary.ready, 1);
+  assert.equal(summary.copyable, true);
+  assert.equal(window.ClaudeLinkHelper.readCopyCandidate(summary.revision).url, first);
+  assert.equal(document.querySelector('claude-link-helper'), null);
+  assert.equal(document.body.innerHTML, before);
+  assert.equal(copied.length, 0);
+});
+test('AOL-style message bodies contain their own toolbar', (t) => {
+  const { document } = setup(t, `<header>AOL Mail</header><main><div class="msgBody">${link()}</div></main>`, true);
+  assert.equal(document.querySelectorAll('.msgBody > claude-link-helper').length, 1);
+  assert.equal(document.querySelector('body > claude-link-helper'), null);
+});
+test('generic detection preserves ambiguity checks without inserting any toolbar', (t) => {
+  const { scan, document, window } = setup(t, `<header>Webmail</header><article>${link()}</article><article>${link(second)}</article>`, true);
+  assert.equal(scan().results.length, 1);
+  assert.equal(scan().results[0].status, 'multiple');
+  assert.equal(window.ClaudeLinkHelper.scan().copyable, false);
+  assert.equal(document.querySelector('claude-link-helper'), null);
+});
+test('popup scan metadata does not expose credentials and old revisions cannot read a new link', (t) => {
+  const { window, document } = setup(t, `<div class="a3s">${link()}</div>`, true);
+  const initial = window.ClaudeLinkHelper.scan();
+  assert.equal(initial.copyable, true);
+  assert.equal(JSON.stringify(initial).includes('TEST_ONLY'), false);
+  assert.equal(window.ClaudeLinkHelper.readCopyCandidate(initial.revision).url, first);
+  document.querySelector('a').href = second;
+  assert.equal(window.ClaudeLinkHelper.readCopyCandidate(initial.revision).status, 'changed');
+  const current = window.ClaudeLinkHelper.scan();
+  assert.ok(current.revision > initial.revision);
+  assert.equal(window.ClaudeLinkHelper.readCopyCandidate(current.revision).url, second);
+});
+test('replacing a message with the same link invalidates the old popup selection', (t) => {
+  const { window, document } = setup(t, `<div class="a3s">${link()}</div>`, true);
+  const initial = window.ClaudeLinkHelper.scan();
+  document.body.innerHTML = `<div class="a3s">${link()}</div>`;
+  assert.equal(window.ClaudeLinkHelper.readCopyCandidate(initial.revision).status, 'changed');
+});
+test('popup read blocks newly ambiguous mail and missing document bodies', (t) => {
+  const { window, document } = setup(t, `<div class="a3s">${link()}</div>`, true);
+  const initial = window.ClaudeLinkHelper.scan();
+  document.querySelector('.a3s').insertAdjacentHTML('beforeend', link(second));
+  assert.equal(window.ClaudeLinkHelper.readCopyCandidate(initial.revision).status, 'changed');
+  assert.equal(window.ClaudeLinkHelper.scan().copyable, false);
+  document.body.remove();
+  assert.equal(window.ClaudeLinkHelper.readCopyCandidate(initial.revision).status, 'changed');
+});
+test('multiple individually valid mail bodies do not expose a global popup copy candidate', (t) => {
+  const { window } = setup(t, `<div class="a3s">${link()}</div><div class="a3s">${link(second)}</div>`, true);
+  const summary = window.ClaudeLinkHelper.scan();
+  assert.equal(summary.ready, 2);
+  assert.equal(summary.copyable, false);
+  assert.equal(window.ClaudeLinkHelper.readCopyCandidate(summary.revision).status, 'changed');
+});
+
+test('table-based login buttons remain unchanged during generic scanning', (t) => {
+  const { window, document } = setup(t, `<main><table><tbody><tr><td bgcolor="#141413" style="border-radius:10px;padding:12px 24px">${link()}</td></tr></tbody></table></main>`);
+  const before = document.body.innerHTML;
+  window.eval(source('content'));
+  for (let i = 0; i < 3; i++) assert.equal(window.ClaudeLinkHelper.scan().copyable, true);
+  assert.equal(document.body.innerHTML, before);
+  assert.equal(document.querySelector('td').children.length, 1);
+});
+test('losing a known body boundary removes the old toolbar and keeps popup copying', (t) => {
+  const { window, document } = setup(t, `<div class="a3s">${link()}</div>`, true);
+  assert.equal(document.querySelectorAll('claude-link-helper').length, 1);
+  document.querySelector('.a3s').className = 'unknown-mail-body';
+  const summary = window.ClaudeLinkHelper.scan();
+  assert.equal(summary.ready, 1);
+  assert.equal(summary.copyable, true);
+  assert.equal(document.querySelector('claude-link-helper'), null);
+});

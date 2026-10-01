@@ -1,6 +1,6 @@
 {
   "name": "claude-link-helper",
-  "version": "1.0.4",
+  "version": "1.0.7",
   "private": true,
   "type": "module",
   "description": "A local-only Chrome extension for copying Claude email sign-in links.",
