@@ -1,0 +1,11 @@
+import { mkdir, readFile, rm } from 'node:fs/promises';
+import { execFileSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
+const root = fileURLToPath(new URL('../', import.meta.url));
+execFileSync(process.execPath, ['scripts/check.mjs'], { cwd: root, stdio: 'inherit' });
+const manifest = JSON.parse(await readFile(new URL('../extension/manifest.json', import.meta.url), 'utf8'));
+await mkdir(new URL('../dist/', import.meta.url), { recursive: true });
+const target = fileURLToPath(new URL(`../dist/claude-link-helper-${manifest.version}.zip`, import.meta.url));
+await rm(target, { force: true });
+execFileSync('zip', ['-q', '-r', target, '.', '-x', '*.DS_Store', '*.svg'], { cwd: `${root}/extension` });
+console.log(`Created ${target}`);

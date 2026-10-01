@@ -1,0 +1,52 @@
+{
+  "manifest_version": 3,
+  "name": "Claude 登录链接助手",
+  "version": "1.0.0",
+  "minimum_chrome_version": "119",
+  "description": "在邮件旁一键复制 Claude Sign in 登录链接。唯一链接校验、歧义提示，全部在本地处理。",
+  "permissions": ["activeTab", "scripting", "clipboardWrite"],
+  "action": {
+    "default_title": "Claude 登录链接助手",
+    "default_popup": "popup.html",
+    "default_icon": { "16": "icons/16.png", "32": "icons/32.png", "48": "icons/48.png", "128": "icons/128.png" }
+  },
+  "icons": { "16": "icons/16.png", "32": "icons/32.png", "48": "icons/48.png", "128": "icons/128.png" },
+  "content_scripts": [{
+    "matches": [
+      "https://mail.google.com/*",
+      "https://outlook.live.com/*",
+      "https://outlook.office.com/*",
+      "https://outlook.office365.com/*",
+      "https://outlook.cloud.microsoft/*",
+      "https://mail.proton.me/*",
+      "https://mail.protonmail.com/*",
+      "https://app.tuta.com/*",
+      "https://mail.tutanota.com/*",
+      "https://mail.tuta.com/*",
+      "https://mail.zoho.com/*",
+      "https://mail.zoho.eu/*",
+      "https://mail.zoho.in/*",
+      "https://mail.zoho.com.au/*",
+      "https://mail.zoho.jp/*",
+      "https://mail.zoho.ca/*",
+      "https://mail.zoho.com.cn/*",
+      "https://mail.zoho.sa/*",
+      "https://mail.zohocloud.ca/*",
+      "https://mail.yahoo.com/*",
+      "https://app.fastmail.com/*",
+      "https://mail.qq.com/*",
+      "https://wx.mail.qq.com/*",
+      "https://mail.163.com/*",
+      "https://mail.126.com/*",
+      "https://*.mail.163.com/*",
+      "https://*.mail.126.com/*"
+    ],
+    "js": ["core.js", "dom.js", "content.js"],
+    "run_at": "document_idle",
+    "all_frames": true,
+    "match_origin_as_fallback": true
+  }],
+  "content_security_policy": {
+    "extension_pages": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'none'"
+  }
+}
