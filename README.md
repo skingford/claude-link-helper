@@ -67,7 +67,7 @@ Shadow DOM isolates the UI. Status messages show the host and counts, not full t
 
 ## Development and validation
 
-Node.js is not required to load the extension. Development and tests require Node.js 20 or later. `jsdom` is a development dependency and is excluded from the extension package.
+Node.js is not required to load the extension. Development and tests require Node.js 20 or later. `jsdom` and the SVG renderer are development dependencies and are excluded from the extension package.
 
 ```sh
 npm ci
@@ -76,7 +76,9 @@ npm run check
 npm run package
 ```
 
-`npm run package` creates `dist/claude-link-helper-1.0.3.zip` using the system `zip` command. The archive contains only files from `extension/`, excluding tests, development dependencies, and email fixtures.
+`npm run package` creates `dist/claude-link-helper-1.0.4.zip` using the system `zip` command. The archive contains only files from `extension/`, excluding tests, development dependencies, and email fixtures.
+
+Run `npm run icons` to regenerate the bundled PNG icons from the official Claude SVG mark. See the [asset source notes](assets/README.md).
 
 To run the local interactive demo:
 
@@ -95,6 +97,7 @@ All test credentials are synthetic. The demo includes single-link, colon-separat
 
 ## Recent changes
 
+- **1.0.4:** Replaced the extension and popup icons with the official Claude symbol, bundled locally as transparent PNGs.
 - **1.0.3:** Fixed popup width so Chrome's initial narrow viewport cannot collapse the title and button into vertical text.
 - **1.0.2:** Introduced a transparent toolbar with a right-aligned charcoal (`#292723`) copy button, a compact popup with collapsible help, and light/dark popup themes.
 - **1.0.1:** Fixed rejection of `#token:base64-payload` login links that left the copy button disabled.

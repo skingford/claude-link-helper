@@ -1,12 +1,13 @@
 {
   "name": "claude-link-helper",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "private": true,
   "type": "module",
   "description": "A local-only Chrome extension for copying Claude email sign-in links.",
   "scripts": {
     "test": "node --test tests/*.test.mjs",
     "check": "node scripts/check.mjs",
+    "icons": "node scripts/generate-icons.mjs",
     "package": "node scripts/package.mjs",
     "demo": "node scripts/demo-server.mjs"
   },
@@ -14,6 +15,7 @@
     "node": ">=20"
   },
   "devDependencies": {
+    "@resvg/resvg-js": "^2.6.2",
     "jsdom": "^26.1.0"
   }
 }

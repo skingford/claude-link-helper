@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Claude Link Helper",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "minimum_chrome_version": "119",
   "description": "Copy Claude sign-in links from your email. Runs locally and warns about missing or ambiguous links.",
   "permissions": ["activeTab", "scripting", "clipboardWrite"],

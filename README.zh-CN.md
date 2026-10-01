@@ -67,7 +67,7 @@ UI 使用 Shadow DOM 隔离。状态中只展示域名和数量，不展示完�
 
 ## 开发与验证
 
-加载扩展不需要 Node.js。开发和测试需要 Node.js 20 或更高版本。`jsdom` 是开发依赖，不进入扩展安装包。
+加载扩展不需要 Node.js。开发和测试需要 Node.js 20 或更高版本。`jsdom` 和 SVG 渲染器均为开发依赖，不进入扩展安装包。
 
 ```sh
 npm ci
@@ -76,7 +76,9 @@ npm run check
 npm run package
 ```
 
-`npm run package` 使用系统 `zip` 命令生成 `dist/claude-link-helper-1.0.3.zip`。安装包只包含 `extension/` 下的文件，不打包测试、开发依赖和邮件样本。
+`npm run package` 使用系统 `zip` 命令生成 `dist/claude-link-helper-1.0.4.zip`。安装包只包含 `extension/` 下的文件，不打包测试、开发依赖和邮件样本。
+
+运行 `npm run icons` 可从官方 Claude SVG 标志重新生成扩展使用的 PNG 图标；参见[资源来源说明](assets/README.md)。
 
 启动本地交互测试：
 
@@ -95,6 +97,7 @@ npm run demo
 
 ## 最近更新
 
+- **1.0.4：** 扩展和弹窗图标替换为官方 Claude 标志，以透明背景 PNG 随扩展本地打包。
 - **1.0.3：** 修复弹窗宽度，避免 Chrome 初始窄视口导致标题和按钮文字竖向换行。
 - **1.0.2：** 增加透明工具条，右侧使用深炭色（`#292723`）复制按钮；精简弹窗、折叠说明，并支持深浅色弹窗主题。
 - **1.0.1：** 修复 `#token:base64载荷` 格式的登录链接被误判、导致复制按钮禁用的问题。

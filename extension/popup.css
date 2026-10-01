@@ -21,7 +21,7 @@
 html, body { width: 320px; min-width: 320px; }
 body { margin: 0; }
 header { display: flex; align-items: center; gap: 9px; padding: 20px 20px 0; }
-.app-icon { width: 20px; height: 20px; flex: none; color: var(--text); }
+.app-icon { width: 24px; height: 24px; flex: none; object-fit: contain; }
 h1 { margin: 0; font-size: 15px; line-height: 24px; font-weight: 600; white-space: nowrap; }
 main { padding: 0 20px; }
 .instruction { margin: 14px 0 16px; color: var(--muted); }
