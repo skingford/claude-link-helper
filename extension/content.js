@@ -115,7 +115,7 @@
     style.textContent = STYLE;
     const box = document.createElement("section");
     box.className = "panel";
-    box.setAttribute("aria-label", "Claude Link Helper");
+    box.setAttribute("aria-label", "Link Helper for Claude");
     const button = document.createElement("button");
     button.type = "button";
     const label = document.createElement("span");

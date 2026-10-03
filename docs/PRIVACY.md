@@ -1,10 +1,10 @@
-# Claude Link Helper — Privacy Policy
+# Link Helper for Claude — Privacy Policy
 
 **English** | [简体中文](PRIVACY.zh-CN.md)
 
-Effective date: October 1, 2026
+Effective date: October 3, 2026
 
-Claude Link Helper is an independent browser extension maintained through the [project repository](https://github.com/skingford/claude-link-helper). It is not affiliated with or endorsed by Anthropic.
+Link Helper for Claude is an independent browser extension maintained through the [project repository](https://github.com/skingford/claude-link-helper). It is not affiliated with or endorsed by Anthropic.
 
 ## What the extension accesses
 
@@ -49,6 +49,6 @@ Data is used only to provide the extension's disclosed link detection and copyin
 
 ## Contact and changes
 
-For privacy questions, open an issue in the [project's issue tracker](https://github.com/skingford/claude-link-helper/issues). Do not include real login links, tokens, or private email content in a public issue.
+For privacy questions, email [aisolocode@gmail.com](mailto:aisolocode@gmail.com) or open an issue in the [project's issue tracker](https://github.com/skingford/claude-link-helper/issues). Do not include real login links, tokens, or private email content in a public issue.
 
 If these practices change, this policy will be updated with a new effective date, and relevant changes will be reflected in the extension's store disclosures.

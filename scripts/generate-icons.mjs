@@ -1,8 +1,8 @@
-// Rasterize the official Claude mark from the checked-in SVG. No network access.
+// Rasterize the original Link Helper mark from the checked-in SVG. No network access.
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { Resvg } from '@resvg/resvg-js';
 
-const source = await readFile(new URL('../assets/claude-mark.svg', import.meta.url), 'utf8');
+const source = await readFile(new URL('../assets/link-helper.svg', import.meta.url), 'utf8');
 const output = new URL('../extension/icons/', import.meta.url);
 await mkdir(output, { recursive: true });
 
@@ -17,4 +17,4 @@ for (const size of [16, 32, 48, 128]) {
   }
   await writeFile(new URL(`${size}.png`, output), png.asPng());
 }
-console.log('Generated Claude icons: 16, 32, 48 and 128px.');
+console.log('Generated Link Helper icons: 16, 32, 48 and 128px.');

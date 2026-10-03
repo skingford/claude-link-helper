@@ -5,7 +5,7 @@
   const root = document.querySelector('#message');
   const bare = new URLSearchParams(location.search).has('bare');
   const anchor = (url) => `<a href="${url.replaceAll('&','&amp;')}">Sign in with Claude.ai</a>`;
-  const markup = (kind) => `<div class="mail"><h3 class="wordmark">Claude</h3><p>Welcome back. Use the button below to sign in.</p>${
+  const markup = (kind) => `<div class="mail"><h3 class="wordmark">Claude 登录邮件示例</h3><p>Welcome back. Use the button below to sign in.</p>${
     kind === 'composite' ? anchor(tokenComposite) : kind === 'multiple' ? anchor(tokenA) + anchor(tokenB) : kind === 'missing' ? '<p>邮件正文尚未完整加载。</p>' :
     kind === 'unsafe' ? anchor('https://claude.ai.example.invalid/magic-link?token=TEST_ONLY') :
     kind === 'wrapped' ? anchor(`https://nam12.safelinks.protection.outlook.com/?url=${encodeURIComponent(tokenA)}`) :

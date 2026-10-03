@@ -1,10 +1,10 @@
-# Claude Link Helper — 隐私政策
+# Link Helper for Claude — 隐私政策
 
 [English](PRIVACY.md) | **简体中文**
 
-生效日期：2026 年 10 月 1 日
+生效日期：2026 年 10 月 3 日
 
-Claude Link Helper 是通过[项目仓库](https://github.com/skingford/claude-link-helper)维护的独立浏览器扩展，与 Anthropic 无隶属关系，也未获得其背书。
+Link Helper for Claude 是通过[项目仓库](https://github.com/skingford/claude-link-helper)维护的独立浏览器扩展，与 Anthropic 无隶属关系，也未获得其背书。
 
 ## 扩展访问哪些信息
 
@@ -49,6 +49,6 @@ Claude Link Helper 是通过[项目仓库](https://github.com/skingford/claude-l
 
 ## 联系与更新
 
-隐私问题可提交到[项目问题追踪页](https://github.com/skingford/claude-link-helper/issues)。请勿在公开问题中包含真实登录链接、token 或私人邮件内容。
+隐私问题可发送至 [aisolocode@gmail.com](mailto:aisolocode@gmail.com)，或提交到[项目问题追踪页](https://github.com/skingford/claude-link-helper/issues)。请勿在公开问题中包含真实登录链接、token 或私人邮件内容。
 
 如果数据处理方式发生变化，本政策将更新生效日期，相关变化也会同步到扩展的商店披露信息中。

@@ -1,9 +1,12 @@
-# Claude mark
+# Original project artwork
 
-`claude-mark.svg` uses the Claude symbol path and its `#D97757` fill from the [official Claude homepage](https://claude.com/), retrieved on 2026-10-01.
+`link-helper.svg` was drawn for this project on October 3, 2026 using simple
+geometric paths: a white chain on a dark teal rounded square. It contains no
+third-party logo, font, traced artwork, or external dependency.
 
-The symbol's original bounds are 125 × 125. The SVG adds five units of transparent padding on each side for extension icons; the path is unchanged. It contains no scripts, external resources, or fonts.
+Run `npm run icons` to generate the bundled 16, 32, 48, and 128 px PNG files.
+The store icon is a copy of `extension/icons/128.png`. Store screenshot layouts
+use the actual extension UI and visibly labeled synthetic email fixtures.
 
-Run `npm run icons` to generate the 16, 32, 48, and 128px transparent PNGs in `extension/icons/`. The renderer is a development dependency and is not included in the extension package.
-
-The Claude logo belongs to Anthropic. This independent extension is not affiliated with Anthropic.
+Version 1.0.8 replaces the third-party symbol used in previous versions.
+The project is independent and is not affiliated with or endorsed by Anthropic.

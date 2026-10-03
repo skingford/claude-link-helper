@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <title>Link Helper — original link icon</title>
+  <rect x="8" y="8" width="112" height="112" rx="26" fill="#214D57"/>
+  <g fill="none" stroke="#FFF" stroke-width="9" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M55 48 63 40a18 18 0 0 1 25 25l-8 8"/>
+    <path d="m73 80-8 8a18 18 0 0 1-25-25l8-8"/>
+    <path d="m51 77 26-26"/>
+  </g>
+</svg>

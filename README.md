@@ -1,8 +1,8 @@
-# Claude Link Helper
+# Link Helper for Claude
 
 **English** | [简体中文](README.zh-CN.md)
 
-A Chrome Manifest V3 extension that copies the link behind the **Sign in** button in a Claude login email. It adds a copy button above the expanded message body and runs entirely on your device, with no server or build step required.
+An independent, unofficial Chrome Manifest V3 extension that copies the link behind the **Sign in** button in a Claude login email. It adds a copy button above the expanded message body and runs entirely on your device, with no server or build step required.
 
 The extension name and browser description are in English. Action labels and status messages are currently in Simplified Chinese.
 
@@ -54,6 +54,8 @@ The copy button sits on the right of a compact toolbar, with status text on the 
 
 ## Privacy and permissions
 
+[Privacy policy](docs/PRIVACY.md) · [隐私政策](docs/PRIVACY.zh-CN.md)
+
 The extension runtime contains no network requests, analytics, log uploads, or remote dependencies. Email content and links are processed only in memory on the current page. They are not persisted, and the extension does not use browser storage, cookies, mail APIs, or a background service.
 
 | Access or permission | Purpose |
@@ -76,9 +78,9 @@ npm run check
 npm run package
 ```
 
-`npm run package` creates `dist/claude-link-helper-1.0.7.zip` using the system `zip` command. The archive contains only files from `extension/`, excluding tests, development dependencies, and email fixtures.
+`npm run package` creates `dist/claude-link-helper-1.0.8.zip` using the system `zip` command. The archive contains only files from `extension/`, excluding tests, development dependencies, and email fixtures.
 
-Run `npm run icons` to regenerate the bundled PNG icons from the official Claude SVG mark. See the [asset source notes](assets/README.md).
+Run `npm run icons` to regenerate the bundled PNG icons from the original Link Helper SVG mark. See the [asset source notes](assets/README.md).
 
 To run the local interactive demo:
 
@@ -99,10 +101,12 @@ For popup copying, open `http://127.0.0.1:4173/tests/popup-demo.html`. This loca
 
 ## Recent changes
 
+- **1.0.8:** Introduced an original link icon and clearer unofficial branding; removed the third-party logo from the package and store materials.
+
 - **1.0.7:** The popup now always uses light mode, with a solid copy button and a plain scan button, regardless of the browser or system theme.
 - **1.0.6:** Generic detection no longer inserts controls into an unknown email layout; copying remains available in the popup without changing the original Sign in button.
 - **1.0.5:** Added direct popup copying after a manual scan, with fresh document/link checks.
-- **1.0.4:** Replaced the extension and popup icons with the official Claude symbol, bundled locally as transparent PNGs.
+- **1.0.4:** Updated icons. That artwork was replaced by an original design in 1.0.8.
 - **1.0.3:** Fixed popup width so Chrome's initial narrow viewport cannot collapse the title and button into vertical text.
 - **1.0.2:** Introduced a transparent toolbar with a right-aligned charcoal (`#292723`) copy button, a compact popup with collapsible help, and light/dark popup themes.
 - **1.0.1:** Fixed rejection of `#token:base64-payload` login links that left the copy button disabled.
